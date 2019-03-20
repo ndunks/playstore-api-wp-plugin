@@ -188,8 +188,21 @@ class Playstore_API {
 	function shortcode_download_url($arg, $content, $tag)
 	{
 		global $id;
+		$query_apk_id = null;
 
-		$post_id	= isset($_GET['apk_id']) ? intval($_GET['apk_id']) : $id;
+		if(isset($_GET['apk_id'])){
+			$query_apk_id = $_GET['apk_id'];
+		}elseif(stripos($_SERVER['REQUEST_URI'], 'apk_id')){
+			// Try find directory from URL!
+			$query = [];
+			parse_str( parse_url($_SERVER['REQUEST_URI'],PHP_URL_QUERY), $query );
+			if(isset($query['apk_id'])){
+				$query_apk_id = $query['apk_id'];
+			}
+
+		}
+
+		$post_id	= isset($query_apk_id) ? intval($query_apk_id) : $id;
 		$download	= get_metadata('post', $post_id, 'apk_download', true);
 		if($download == 'no') return '/NO_DOWNLOAD_URL';
 
@@ -201,7 +214,9 @@ class Playstore_API {
 		{
 			return get_home_url(null,self::$config['download_page_slug'] . '?apk_id=' . $post_id);
 		}
-		$url	= '/no-download-url';
+
+
+		$url	= '/no-download-url-';
 
 		if($download == 'yes')
 		{
@@ -275,8 +290,13 @@ class Playstore_API {
 
 	}
 
-	function set_user_template($html) { return file_put_contents(self::f("data/template_{$this->UID}.php"), $html); }
-	function delete_user_template() { return unlink(self::f("data/template_{$this->UID}.php")); }
+	function set_user_template($html) {
+		return file_put_contents(self::f("data/template_{$this->UID}.php"), $html);
+	}
+	
+	function delete_user_template() {
+		return unlink(self::f("data/template_{$this->UID}.php"));
+	}
 
 	function menu()
 	{
