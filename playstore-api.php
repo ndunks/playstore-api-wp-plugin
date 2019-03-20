@@ -119,7 +119,18 @@ class Playstore_API {
 		if( ! self::$config['disable_bootstrap_js'] ){
 			wp_enqueue_script('bootstrap', '', array('jquery')	);
 		}
-		wp_enqueue_script('playstore-api', '', array('jquery')	);
+		wp_enqueue_script('playstore-api', '', array('jquery'), self::$version, true	);
+		if(is_page(self::$config['download_page_slug'])){
+			$apk_url = $this->shortcode_download_url(array('in_download_page' => 1), null, null);
+			$wait = intval(self::$config['download_wait']);
+			if( $wait <= 0 ){
+				$wait = 3;
+			}
+			echo "<script type='text/javascript'>" ;
+			echo "var PLAYSTORE_API_APK_URL = " . json_encode($apk_url) . ";";
+			echo "var PLAYSTORE_API_DOWNLOAD_WAIT = $wait;";
+			echo "</script>\n";
+		}
 	}
 
 	function stylesheet($backend = false)

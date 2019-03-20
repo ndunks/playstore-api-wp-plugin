@@ -1,21 +1,5 @@
 <!-- PLAYSTORE_API LINK GENERATOR CODE -->
-<div id="playstore_api_link"><i class="fa fa-spin fa-spinner"></i> Please wait, generating your download URL.. <b class="second">...</b></div>
-<script type="text/javascript">
-var playstore_api_second	= 5;
-var playstore_api_decoded	= "[playstore_api_get_download_url in_download_page=1]";
-var playstore_api_tid		= null;
-function playstore_api_timer()
-{
-	if(playstore_api_second <= 0)
-	{
-		clearInterval(playstore_api_tid);
-		jQuery('#playstore_api_link').html('<a class="btn btn-lg btn-success" href="' + playstore_api_decoded + '">Download Now!</a>');
-		return false;
-	}
-	jQuery('#playstore_api_link .second').html(--playstore_api_second);
-}
-document.addEventListener('DOMContentLoaded', function() {
-    playstore_api_tid = setInterval('playstore_api_timer()', 1000);
-}, false);
-</script>
+<div id="playstore_api_link" class="text-center">
+	<i class="fa fa-spin fa-spinner"></i> Please wait, generating your download URL.. 
+</div>
 <!-- PLAYSTORE_API LINK GENERATOR CODE END -->
