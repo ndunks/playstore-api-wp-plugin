@@ -77,7 +77,7 @@ $config	= array(
 				'download_page_slug'	=> array(
 											'type'		=> 'text',
 											'default'	=> 'download',
-											'info'		=> '<a target="_blank" href="' . self::v('create_default_page') . '">Click here</a> to re-create download page slug.'
+											'info'		=> '<a target="_blank" href="' . self::v('create_default_page') . '">Click here</a> to re-create download page slug. You must set your permalink to "Post name"'
 										),
 				'apk_dir'				=> array(
 											'type'		=> 'text',
