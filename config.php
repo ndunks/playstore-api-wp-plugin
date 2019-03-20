@@ -79,6 +79,11 @@ $config	= array(
 											'default'	=> 'download',
 											'info'		=> '<a target="_blank" href="' . self::v('create_default_page') . '">Click here</a> to re-create download page slug. You must set your permalink to "Post name"'
 										),
+				'download_wait'	=> array(
+											'type'		=> 'text',
+											'default'	=> 5,
+											'info'		=> 'Download landing page timeout in seconds before direct link visible. Minimal 3 seconds.'
+										),
 				'apk_dir'				=> array(
 											'type'		=> 'text',
 											'default'	=> ABSPATH . 'apps',
