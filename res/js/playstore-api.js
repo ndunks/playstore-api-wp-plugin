@@ -1,6 +1,5 @@
 (function ($, download_div_id) {
-	console.log("Playstore Api JS Loaded");
-
+	var is_elementor_preview=location.href.indexOf('elementor-preview') >= 0;
 	// Thumbnail popup
 	if (!!$('#app-images .thumbnail')) {
 
@@ -9,9 +8,11 @@
 	}
 
 	// Download Page
-	if (window['PLAYSTORE_API_APK_URL']) {
+	if (window['PLAYSTORE_API_APK_URL'] && window['PLAYSTORE_API_APK_URL'].length) {
 		if (!$(download_div_id).length) {
 			console.error("No " + download_div_id + ". check your page template");
+		}else if (is_elementor_preview){
+			$(download_div_id).append('<br/><b class="second">' + PLAYSTORE_API_DOWNLOAD_WAIT + '</b>');
 		} else {
 			var timer_id = null;
 			$(download_div_id).append('<br/><b class="second">...</b>');

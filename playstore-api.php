@@ -14,6 +14,12 @@
 1.1 - 2017-09-06
 	- [view/post.php] Fix download error (Updated API Backend)
 
+1.2 - 2019-04-21
+	- Update bootstrap 4
+	- Elementor donwload landing page support
+	- Default template using bootstrap carousel
+	- Add playstore button on admin bar for quick access
+
 ****/
 
 
@@ -51,6 +57,7 @@ class Playstore_API {
 
 		add_action('init'					, array($this, 'init'));
 		add_action('admin_menu'				, array($this, 'menu'));
+		add_action('admin_bar_menu'			, array($this, 'admin_bar_menu'), 90);
 		add_action('wp_print_scripts'		, array($this, 'javascripts'));
 		add_action('wp_print_styles'		, array($this, 'stylesheet'));
 
@@ -97,6 +104,7 @@ class Playstore_API {
 		if(!self::$config['disable_shortcode_all']){
 			add_shortcode('apk', array($this, 'shortcode'));
 			add_shortcode('playstore_api_get_download_url', array($this, 'shortcode_download_url'));
+			add_shortcode('playstore_api_timer_button', array($this, 'shortcode_timer_button'));
 		}
 		if(self::$config['use_landing_page'])
 			add_filter( 'the_title', array($this,'download_page_title'));
@@ -194,6 +202,14 @@ class Playstore_API {
 				$data	=& $data[$key];
 		}
 		return is_array($data) ? json_encode($data, JSON_PRETTY_PRINT) : strval($data);
+	}
+
+	function shortcode_timer_button($arg, $conteng, $tag){
+		return <<<end
+<div id="playstore_api_link" style="text-align: center">
+	<i class="fa fa-spin fa-spinner"></i>
+</div>
+end;
 	}
 
 	function shortcode_download_url($arg, $content, $tag)
@@ -313,6 +329,19 @@ class Playstore_API {
 	{
 		add_menu_page( 'Playstore API', 'Playstore API', 'publish_posts', self::$name, array($this, 'main'),'none');
 	}
+	
+	function admin_bar_menu($wp_admin_bar)
+	{
+		
+		$args = array(
+			'id' => 'playstore-api-button',
+			'title' => '<span>Playstore</span>',
+			'href' => get_admin_url( get_current_blog_id(), 'admin.php?page=' . self::$name)
+		);
+		
+		$wp_admin_bar->add_menu($args);
+	}
+	
 
 	//View Router
 	function main()
