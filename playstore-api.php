@@ -1,7 +1,7 @@
 <?php
 /*
 	Plugin Name: Playstore API
-	Version: 1.1
+	Version: 1.2
 	Description: Playstore API (Unofficial) Plugin for wordpress. Search, get app detail, and download APK to your own hosting. This plugin require API Token from playstore-api.com.
 	Plugin URI: http://playstore-api.com/
 	Author: playstore-api.com
@@ -13,6 +13,12 @@
 	
 1.1 - 2017-09-06
 	- [view/post.php] Fix download error (Updated API Backend)
+
+1.2 - 2019-04-21
+	- Update bootstrap 4
+	- Elementor donwload landing page support
+	- Default template using bootstrap carousel
+	- Add playstore button on admin bar for quick access
 
 ****/
 
@@ -36,7 +42,7 @@ class Playstore_API {
 
 	static	$title	= 'Playstore API';
 	static	$name	= 'playstore_api';
-	static	$version= '1.1';
+	static	$version= '1.2';
 	static	$me		= false;
 	static	$config	= null;
 	static	$var	= array(); // variable scoope for used in plugin code
@@ -51,6 +57,7 @@ class Playstore_API {
 
 		add_action('init'					, array($this, 'init'));
 		add_action('admin_menu'				, array($this, 'menu'));
+		add_action('admin_bar_menu'			, array($this, 'admin_bar_menu'), 90);
 		add_action('wp_print_scripts'		, array($this, 'javascripts'));
 		add_action('wp_print_styles'		, array($this, 'stylesheet'));
 
@@ -97,6 +104,7 @@ class Playstore_API {
 		if(!self::$config['disable_shortcode_all']){
 			add_shortcode('apk', array($this, 'shortcode'));
 			add_shortcode('playstore_api_get_download_url', array($this, 'shortcode_download_url'));
+			add_shortcode('playstore_api_timer_button', array($this, 'shortcode_timer_button'));
 		}
 		if(self::$config['use_landing_page'])
 			add_filter( 'the_title', array($this,'download_page_title'));
@@ -119,7 +127,18 @@ class Playstore_API {
 		if( ! self::$config['disable_bootstrap_js'] ){
 			wp_enqueue_script('bootstrap', '', array('jquery')	);
 		}
-		wp_enqueue_script('playstore-api', '', array('jquery')	);
+		wp_enqueue_script('playstore-api', '', array('jquery'), self::$version, true	);
+		if(is_page(self::$config['download_page_slug'])){
+			$apk_url = $this->shortcode_download_url(array('in_download_page' => 1), null, null);
+			$wait = intval(self::$config['download_wait']);
+			if( $wait <= 0 ){
+				$wait = 3;
+			}
+			echo "<script type='text/javascript'>" ;
+			echo "var PLAYSTORE_API_APK_URL = " . json_encode($apk_url) . ";";
+			echo "var PLAYSTORE_API_DOWNLOAD_WAIT = $wait;";
+			echo "</script>\n";
+		}
 	}
 
 	function stylesheet($backend = false)
@@ -173,23 +192,66 @@ class Playstore_API {
 			return '';
 
 		$data	=& self::$var['apk_data'];
-
+		$call_function = null;
 		while (!empty($args)){
 			$key	= array_shift($args);
+			if($key[0] == ':'){
+				//Warning Command Injection :-)
+				$call_function = substr($key, 1);
+				continue;
+			}
 
 			if(!isset($data[$key]))
 				return '';
 			else
 				$data	=& $data[$key];
 		}
+		// syntax :function(*,args...)
+		if($call_function !== null){
+			$args	= explode('(', $call_function, 2);
+			if( count($args) > 1 ){
+				$call_function = array_shift($args);
+				$args	= explode(',', rtrim($args[0], ')'));
+				foreach ($args as $k => $v) {
+					if( trim($v) === '*' ){
+						$args[$k] = $data;
+						break;
+					}
+				}
+			}else{
+				$args = [$data];
+			}
+			$data = call_user_func_array($call_function, $args);
+		}
 		return is_array($data) ? json_encode($data, JSON_PRETTY_PRINT) : strval($data);
+	}
+
+	function shortcode_timer_button($arg, $conteng, $tag){
+		return <<<end
+<div id="playstore_api_link" style="text-align: center">
+	<i class="fa fa-spin fa-spinner"></i>
+</div>
+end;
 	}
 
 	function shortcode_download_url($arg, $content, $tag)
 	{
 		global $id;
+		$query_apk_id = null;
 
-		$post_id	= isset($_GET['apk_id']) ? intval($_GET['apk_id']) : $id;
+		if(isset($_GET['apk_id'])){
+			$query_apk_id = $_GET['apk_id'];
+		}elseif(stripos($_SERVER['REQUEST_URI'], 'apk_id')){
+			// Try find directory from URL!
+			$query = [];
+			parse_str( parse_url($_SERVER['REQUEST_URI'],PHP_URL_QUERY), $query );
+			if(isset($query['apk_id'])){
+				$query_apk_id = $query['apk_id'];
+			}
+
+		}
+
+		$post_id	= isset($query_apk_id) ? intval($query_apk_id) : $id;
 		$download	= get_metadata('post', $post_id, 'apk_download', true);
 		if($download == 'no') return '/NO_DOWNLOAD_URL';
 
@@ -201,7 +263,9 @@ class Playstore_API {
 		{
 			return get_home_url(null,self::$config['download_page_slug'] . '?apk_id=' . $post_id);
 		}
-		$url	= '/no-download-url';
+
+
+		$url	= '/no-download-url-';
 
 		if($download == 'yes')
 		{
@@ -275,13 +339,31 @@ class Playstore_API {
 
 	}
 
-	function set_user_template($html) { return file_put_contents(self::f("data/template_{$this->UID}.php"), $html); }
-	function delete_user_template() { return unlink(self::f("data/template_{$this->UID}.php")); }
+	function set_user_template($html) {
+		return file_put_contents(self::f("data/template_{$this->UID}.php"), $html);
+	}
+	
+	function delete_user_template() {
+		return unlink(self::f("data/template_{$this->UID}.php"));
+	}
 
 	function menu()
 	{
 		add_menu_page( 'Playstore API', 'Playstore API', 'publish_posts', self::$name, array($this, 'main'),'none');
 	}
+	
+	function admin_bar_menu($wp_admin_bar)
+	{
+		
+		$args = array(
+			'id' => 'playstore-api-button',
+			'title' => '<span>Playstore</span>',
+			'href' => get_admin_url( get_current_blog_id(), 'admin.php?page=' . self::$name)
+		);
+		
+		$wp_admin_bar->add_menu($args);
+	}
+	
 
 	//View Router
 	function main()
