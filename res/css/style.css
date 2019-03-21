@@ -33,3 +33,7 @@
     filter: invert(80%);
     cursor: pointer;
 }
+#google-play-badge .elementor-image {
+    line-height: 150px;
+    vertical-align: middle;
+}

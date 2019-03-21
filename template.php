@@ -46,9 +46,7 @@
 					<table class="table table-sm table-bordered table-details">
 						<tr><td>Developer</td>
 							<td>
-								<a href="https://play.google.com/store/apps/developer?id=<?= urlencode($data['developer_name']) ?>" rel="nofollow" target="_blank">
-								<span><?= $data['developer_name'] ?></span>
-								</a>
+								<a href="https://play.google.com/store/apps/developer?id=<?= urlencode($data['developer_name']) ?>" rel="nofollow" target="_blank"><?= $data['developer_name'] ?></a>
 							</td>
 						</tr>
 						<?php

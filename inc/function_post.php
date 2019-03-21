@@ -77,7 +77,8 @@ function playstore_api_download_images($post_id, &$html, &$data)
 		echo ' [Empty Screenshot] ';
 		return false;
 	}
-	
+	// save downloaded image URL and ID
+	Playstore_API::$var['downloaded_images'] = [];
 	$downloaded		= 0;
 	foreach ($data['screenshot'] as $key => $img_url)
 	{
@@ -94,6 +95,8 @@ function playstore_api_download_images($post_id, &$html, &$data)
 		}else{
 			$html	= str_replace($img_url, $attach['url'], $html);
 			echo '. OK';
+			// Save Globally
+			Playstore_API::$var['downloaded_images'][] = $attach;
 			$downloaded++;
 		}
 
@@ -120,6 +123,7 @@ function playstore_api_set_post_thumbnail($post_id, &$data)
 		return false;
 
 	set_post_thumbnail( $post_id, $attach['id'] );
+	Playstore_API::$var['set_post_thumbnail'] = $attach;
 	return true;
 }
 ?>

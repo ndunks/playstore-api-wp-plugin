@@ -145,6 +145,12 @@ if( self::$config['download_screenshot'] )
 $redirect	= $post_status == 'publish' ? get_permalink( $post_id ) : "post.php?post=$post_id&action=edit";
 flush();
 
+// Elementor Support
+if(class_exists('Elementor\Utils')){
+    
+	include Playstore_API::f('inc/elementor.php');
+}
+	
 ?>
 <div class="notice notice-success"><h2><?php self::e('DONE') ?></h2></div>
 <script type="text/javascript">
