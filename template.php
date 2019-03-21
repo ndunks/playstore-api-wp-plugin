@@ -1,12 +1,27 @@
-<div itemscope="" itemtype="http://schema.org/MobileApplication">
-	<meta itemprop="name" content="<?= htmlentities($data['name']) ?>"/>
-	
-	<div id="app-images">
-		<?php 
-		foreach ($data['screenshot'] as $i => $src){
-			printf('<img class="thumbnail" itemprop="screenshot" src="%s" title="%s">', $src, $data['name'] . ' Screendshot ' . ($i+1) );
-		}
-		 ?>
+<div>
+	<div id="playstore-api-bscarousel" class="carousel slide" data-ride="carousel">
+		<!-- Bootstrap Carousel -->
+		<?php
+			$indicators = [];
+			$images		= [];
+			foreach ($data['screenshot'] as $i => $src){
+				$class = $i == 0 ? 'active' : '';
+				$indicators[] 	= sprintf('<li data-target="#playstore-api-bscarousel" data-slide-to="%d" class="%s"></li>', $i, $class);
+				$images[]		= sprintf('<div class="carousel-item %s"><img src="%s" alt="%s"></div>',
+											$class, $src, esc_attr( $data['name'] . ' Screendshot ' . ($i+1) ) );
+			}
+
+		?>
+		 <ol class="carousel-indicators"><?php echo implode("\n", $indicators) ?></ol>
+		<div class="carousel-inner"><?php echo implode("\n", $images) ?></div>
+		<a class="carousel-control-prev" href="#playstore-api-bscarousel" role="button" data-slide="prev">
+			<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+			<span class="sr-only"><?php _e('Previous') ?></span>
+		</a>
+		<a class="carousel-control-next" href="#playstore-api-bscarousel" role="button" data-slide="next">
+			<span class="carousel-control-next-icon" aria-hidden="true"></span>
+			<span class="sr-only"><?php _e('Next') ?></span>
+		</a>
 	</div>
 	<?php if(!empty($data['youtube_id'])):
 	 ?>
@@ -21,7 +36,7 @@
 				<?php echo $data['description'] ?>
 				<?php if($data['recent_changes']) : ?>
 				<h2>What's New</h2>
-				<div itemprop="releaseNotes">
+				<div>
 				<?= $data['recent_changes'] ?>
 				</div>
 				<?php endif ?>
@@ -30,41 +45,39 @@
 				<div class="panel panel-default">
 					<table class="table table-sm table-bordered table-details">
 						<tr><td>Developer</td>
-							<td itemprop="author" itemscope="" itemtype="http://schema.org/Organization">
-								<a href="https://play.google.com/store/apps/developer?id=<?= urlencode($data['developer_name']) ?>" itemprop="url" rel="nofollow" target="_blank">
-								<span itemprop="name"><?= $data['developer_name'] ?></span>
+							<td>
+								<a href="https://play.google.com/store/apps/developer?id=<?= urlencode($data['developer_name']) ?>" rel="nofollow" target="_blank">
+								<span><?= $data['developer_name'] ?></span>
 								</a>
 							</td>
 						</tr>
 						<?php
 
 							if(isset($data['upload_date']))
-								printf('<tr><td>%s</td><td itemprop="datePublished">%s</td></tr>', 'Published', $data['upload_date'] );
+								printf('<tr><td>%s</td><td>%s</td></tr>', 'Published', $data['upload_date'] );
 
 							if(isset($data['downloads']))
 								printf('<tr><td>%s</td><td>%s</td></tr>', 'Downloaded', $data['downloads']);
 
 							if(isset($data['operatingSystems']))
-								printf('<tr><td>%s</td><td itemprop="operatingSystem">%s</td></tr>', 'Android Version', $operatingSystems);
+								printf('<tr><td>%s</td><td>%s</td></tr>', 'Android Version', $operatingSystems);
 							
 							if(isset($data['type']))
-								printf('<tr><td>%s</td><td itemprop="applicationCategory">%s</td></tr>', 'Type', $data['type'] );
+								printf('<tr><td>%s</td><td>%s</td></tr>', 'Type', $data['type'] );
 							
 							if(isset($data['category']))
-								printf('<tr><td>%s</td><td itemprop="applicationSubCategory">%s</td></tr>', 'Category', $data['category'] );
+								printf('<tr><td>%s</td><td>%s</td></tr>', 'Category', $data['category'] );
 							
 							if(isset($data['version']))
-								printf('<tr><td>%s</td><td itemprop="softwareVersion">%s</td></tr>', 'Version', $data['version'] );
+								printf('<tr><td>%s</td><td>%s</td></tr>', 'Version', $data['version'] );
 							
 							if(isset($data['file_size']))
-								printf('<tr><td>%s</td><td itemprop="fileSize">%s</td></tr>', 'Size', $data['file_size'] );
+								printf('<tr><td>%s</td><td>%s</td></tr>', 'Size', $data['file_size'] );
 							
 							if(isset($data['rating'])): ?>
 						<tr>
 							<td colspan="2">
-								<div class="text-center" itemprop="aggregateRating" itemscope="itemscope" itemtype="http://schema.org/AggregateRating">
-									<meta content="<?php echo $data['rating']['star_rating'] ?>" itemprop="ratingValue"/>
-									<meta content="<?php echo $data['rating']['ratings_count'] ?>" itemprop="ratingCount"/>
+								<div class="text-center">
 									<div class="h3">Rating <?php echo number_format($data['rating']['star_rating'],2) ?></div>
 									<div class="star-container">
 										<div class="star">
