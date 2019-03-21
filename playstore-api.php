@@ -192,14 +192,36 @@ class Playstore_API {
 			return '';
 
 		$data	=& self::$var['apk_data'];
-
+		$call_function = null;
 		while (!empty($args)){
 			$key	= array_shift($args);
+			if($key[0] == ':'){
+				//Warning Command Injection :-)
+				$call_function = substr($key, 1);
+				continue;
+			}
 
 			if(!isset($data[$key]))
 				return '';
 			else
 				$data	=& $data[$key];
+		}
+		// syntax :function(*,args...)
+		if($call_function !== null){
+			$args	= explode('(', $call_function, 2);
+			if( count($args) > 1 ){
+				$call_function = array_shift($args);
+				$args	= explode(',', rtrim($args[0], ')'));
+				foreach ($args as $k => $v) {
+					if( trim($v) === '*' ){
+						$args[$k] = $data;
+						break;
+					}
+				}
+			}else{
+				$args = [$data];
+			}
+			$data = call_user_func_array($call_function, $args);
 		}
 		return is_array($data) ? json_encode($data, JSON_PRETTY_PRINT) : strval($data);
 	}
