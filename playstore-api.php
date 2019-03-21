@@ -1,7 +1,7 @@
 <?php
 /*
 	Plugin Name: Playstore API
-	Version: 1.1
+	Version: 1.2
 	Description: Playstore API (Unofficial) Plugin for wordpress. Search, get app detail, and download APK to your own hosting. This plugin require API Token from playstore-api.com.
 	Plugin URI: http://playstore-api.com/
 	Author: playstore-api.com
@@ -42,7 +42,7 @@ class Playstore_API {
 
 	static	$title	= 'Playstore API';
 	static	$name	= 'playstore_api';
-	static	$version= '1.1';
+	static	$version= '1.2';
 	static	$me		= false;
 	static	$config	= null;
 	static	$var	= array(); // variable scoope for used in plugin code

@@ -32,16 +32,15 @@ foreach ($apps as $app)
 	printf('
 		<tr>
 			<td width="64px"><img class="icon" src="%s=w48"/></td>
-			<td><a href="%s" class="h3">%s</a></td>
-			<td>%s</td>
+			<td><a href="%s" class="h5">%s</a></td>
 			<td>%s</td>
 			<td>
-				<a href="%s" class="btn btn-small btn-default" title="%s" target="_blank"><i class="fa fa-paper-plane"></i> %s</a> 
-				<a href="%s" class="btn btn-small btn-default" title="%s" target="_blank"><i class="fa fa-pencil"></i> %s</a> 
-				<a href="%s" class="btn btn-small btn-default" title="%s" target="_blank"><i class="fa fa-eye"></i> %s</a>
+				<a href="%s" class="btn btn-sm btn-default" title="%s" target="_blank"><i class="fa fa-paper-plane"></i> %s</a> 
+				<a href="%s" class="btn btn-sm btn-default" title="%s" target="_blank"><i class="fa fa-pencil"></i> %s</a> 
+				<a href="%s" class="btn btn-sm btn-default" title="%s" target="_blank"><i class="fa fa-eye"></i> %s</a>
 			</td>
 		</tr>',
-			$icon, self::v('detail&id=' . $package), $name, $price, $creator, 
+			$icon, self::v('detail&id=' . $package), $name, $creator, 
 			self::v('post&publish=1&id=' . $package), self::_('Make post and publish it.'), self::_('Publish Post'),
 			self::v('post&id=' . $package), self::_('Make post and edit before publish.'), self::_('Make Post'),
 			self::v('preview&id=' . $package), self::_('Preview post with current template.'), self::_('Preview')
