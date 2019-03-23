@@ -31,4 +31,5 @@
 			}, false);
 		}
 	}
+	
 })(jQuery, '#playstore_api_link')

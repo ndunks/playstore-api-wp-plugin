@@ -142,6 +142,13 @@ if( self::$config['download_screenshot'] )
 	}else echo '<br/>' . self::e('FAILED TO DOWNLOAD SCREENSHOT IMAGES') . '<br/>';
 
 }
+
+if(self::$config['download_screenshot'] ||  self::$config['autoset_thumbnail'] )
+{
+	// Update data to keep track on downloaded screenshots and icon
+	update_post_meta( $post_id, 'apk_data', $post->data );
+}
+
 $redirect	= $post_status == 'publish' ? get_permalink( $post_id ) : "post.php?post=$post_id&action=edit";
 flush();
 

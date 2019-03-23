@@ -47,6 +47,7 @@ class Playstore_API {
 	static	$config	= null;
 	static	$var	= array(); // variable scoope for used in plugin code
 	static	$DEMO	= false;
+	static	$has_elementor = false;
 
 	function __construct()
 	{
@@ -75,16 +76,26 @@ class Playstore_API {
 		if( !empty( $saved_config ) && is_array($saved_config) )
 			self::$config	= $saved_config;
 		else self::$config	= self::default_config();
+		foreach (get_option('active_plugins') as $key => $value) {
+			if(strpos($value, 'elementor/') >= 0){
+				include Playstore_API::f('inc/elementor.php');
+				self::$has_elementor = true;
+				break;
+			}
+		}
+
 	}
 	
 	function init()
 	{
-		wp_register_script('bootstrap'			, PLAYSTORE_API_URL . 'res/js/bootstrap.js');
-		wp_register_script('playstore-api'		, PLAYSTORE_API_URL . 'res/js/playstore-api.js');
-		wp_register_style('bootstrap'			, PLAYSTORE_API_URL . 'res/css/bootstrap.css');
-		wp_register_style('font-awesome'		, PLAYSTORE_API_URL . 'res/css/font-awesome.css');
-		wp_register_style('playstore-api'		, PLAYSTORE_API_URL . 'res/css/style.css');
-		wp_register_style('playstore-api-admin'	, PLAYSTORE_API_URL . 'res/css/admin.css');
+
+		wp_register_script('bootstrap'				, PLAYSTORE_API_URL . 'res/js/bootstrap.js', ['jquery' ], self::$version, false);
+		wp_register_script('playstore-api'			, PLAYSTORE_API_URL . 'res/js/playstore-api.js', ['jquery' ], self::$version, true);
+		wp_register_script('playstore-api-elementor', PLAYSTORE_API_URL . 'res/js/elementor.js', ['jquery', 'elementor-frontend'], self::$version, true);
+		wp_register_style('bootstrap'				, PLAYSTORE_API_URL . 'res/css/bootstrap.css');
+		wp_register_style('font-awesome'			, PLAYSTORE_API_URL . 'res/css/font-awesome.css');
+		wp_register_style('playstore-api'			, PLAYSTORE_API_URL . 'res/css/style.css');
+		wp_register_style('playstore-api-admin'		, PLAYSTORE_API_URL . 'res/css/admin.css');
 		$this->UID = get_current_user_id();
 
 		self::default_config();
@@ -108,6 +119,8 @@ class Playstore_API {
 		}
 		if(self::$config['use_landing_page'])
 			add_filter( 'the_title', array($this,'download_page_title'));
+		
+		
 	}
 
 	function notify_download_page()
@@ -125,9 +138,16 @@ class Playstore_API {
 	function javascripts()
 	{
 		if( ! self::$config['disable_bootstrap_js'] ){
-			wp_enqueue_script('bootstrap', '', array('jquery')	);
+			wp_enqueue_script('bootstrap');
 		}
-		wp_enqueue_script('playstore-api', '', array('jquery'), self::$version, true	);
+
+		wp_enqueue_script('playstore-api' );
+		
+		if( self::$has_elementor )
+		{
+			wp_enqueue_script('playstore-api-elementor');
+		}
+
 		if(is_page(self::$config['download_page_slug'])){
 			$apk_url = $this->shortcode_download_url(array('in_download_page' => 1), null, null);
 			$wait = intval(self::$config['download_wait']);
@@ -410,6 +430,18 @@ end;
 		delete_option(self::$name);
 	}
 
+	/**
+	 * Check an get the apk_data
+	 */
+	static function is_apk_post(){
+		global $id;
+		if(!empty(@self::$var['apk_data'])){
+			return true;
+		}else{
+			return self::$me->get_meta_apk_data($id);
+		}
+	}
+
 	static function update_option($new_key = null, $new_val = null)
 	{
 		if(!is_null($new_key))
@@ -420,6 +452,9 @@ end;
 	static function get_app($package)
 	{
 		$data	= Playstore_API::query( 'detail', array('id' => $package ));
+		$data['rating_simple'] = number_format(floatval(@$data['rating']['star_rating']), 1);
+		$data['developer_url'] = 'https://play.google.com/store/apps/developer?id=' . urlencode($data['developer_name']);
+		$data['developer_link'] = sprintf('<a href="%s" rel="nofollow" target="_blank">%s</a>', $data['developer_url'], esc_html($data['developer_name']) );
 		require_once self::f('inc/playstore-api-post.php');
 		return new Playstore_API_Post($data);
 	}
