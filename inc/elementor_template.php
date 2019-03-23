@@ -13,91 +13,107 @@ $elementor = [
 
 
 // Carousel Block
-if(isset(Playstore_API::$var['downloaded_images'])){
-
-    $elementor['data'][] = 
-        [
-            'id' => Utils::generate_random_string(),
-            'elType' => 'section',
-            'isInner'   => false,
-            'elements' => [
-                [
-                    'id' => Utils::generate_random_string(),
-                    'elType' => 'column',
-                    'isInner'   => false,
-                    'elements' => [ 
-                        [
-                            'id' => Utils::generate_random_string(),
-                            'elType' => 'widget',
-                            'widgetType' => 'image-carousel',
-                            'settings' => [
-                                'carousel' => Playstore_API::$var['downloaded_images']
-                            ],
-                        ]
-                     ]
-                ],
+$elementor['data'][] = 
+    [
+        'id' => Utils::generate_random_string(),
+        'elType' => 'section',
+        'isInner'   => false,
+        'elements' => [
+            [
+                'id' => Utils::generate_random_string(),
+                'elType' => 'column',
+                'isInner'   => false,
+                'elements' =>
+                [ 
+                    [
+                        'id' => Utils::generate_random_string(),
+                        'elType' => 'widget',
+                        'widgetType' => 'apk-screenshot'
+                    ]
+                ]
             ],
-        ];
-}
+        ],
+    ];
 
-// Desccription block and block info
+// Left Block Desccription block and block info
 $left_block = [];
 
 // Description Heading
 $left_block[] =
-    [
-        "id" =>  Utils::generate_random_string(),
-        "elType" => "widget",
-        "widgetType" => "heading",
-        "settings" => [
-            "title" => __("Description")
-        ],
-        "elements" => []
-    ];
+[
+    "id" =>  Utils::generate_random_string(),
+    "elType" => "widget",
+    "widgetType" => "heading",
+    "settings" => [
+        "title" => __("Description")
+    ],
+    "elements" => []
+];
 
 // Description Content
 $left_block[] =
+[
+    'id' => Utils::generate_random_string(),
+    'elType' => 'widget',
+    'widgetType' => 'text-editor',
+    'settings' =>
     [
-        'id' => Utils::generate_random_string(),
-        'elType' => 'widget',
-        'widgetType' => 'text-editor',
-        'settings' =>
-        [
-            'editor' => '[apk description]',
-        ]
-    ];
-// Recent changes
+        'editor' => '[apk description]',
+    ]
+];
+
 // What's New Heading
 $left_block[] =
+[
+    "id" =>  Utils::generate_random_string(),
+    "elType" => "widget",
+    "settings" =>
     [
-        "id" =>  Utils::generate_random_string(),
-        "elType" => "widget",
-        "settings" =>
-        [
-            "title" => __("What's New")
-        ],
-        "elements" => [],
-        "widgetType" => "heading"
-    ];
-    // What's New Content
+        "title" => __("What's New")
+    ],
+    "elements" => [],
+    "widgetType" => "heading"
+];
+// What's New Content
 $left_block[] =
+[
+    'id' => Utils::generate_random_string(),
+    'elType' => 'widget',
+    'widgetType' => 'text-editor',
+    'settings' =>
     [
-        'id' => Utils::generate_random_string(),
-        'elType' => 'widget',
-        'widgetType' => 'text-editor',
-        'settings' =>
-        [
-            'editor' => '[apk recent_changes]',
-        ]
-    ];
-    
+        'editor' => '[apk recent_changes]',
+    ]
+];
+// Right Block
+$right_block = [];
 
-// Right block
-ob_start();
-
-include Playstore_API::f('inc/elementor_appinfo.php');
-$appinfo_content = ob_get_clean();
-
+// Video
+$right_block[] =
+[
+    'id' => Utils::generate_random_string(),
+    'elType' => 'widget',
+    'widgetType' => 'apk-video'
+];
+// Detail tables
+$right_block[] =
+[
+    'id' => Utils::generate_random_string(),
+    'elType' => 'widget',
+    'widgetType' => 'apk-app-info'
+];
+// Star Ratings
+$right_block[] =
+[
+    'id' => Utils::generate_random_string(),
+    'elType' => 'widget',
+    'widgetType' => 'apk-star-rating',
+    'settings' =>
+    [
+        "title" => "Rating [apk rating_simple]",
+        "align" => "center"
+    ]
+];
 
 // Append left and right block
 $elementor['data'][] =
@@ -131,18 +147,7 @@ $elementor['data'][] =
                     "_column_size" => 50,
                     "_inline_size" => null
                 ],
-                'elements' =>
-                [
-                    [
-                        'id' => Utils::generate_random_string(),
-                        'elType' => 'widget',
-                        'widgetType' => 'text-editor',
-                        'settings' =>
-                        [
-                            'editor' => $appinfo_content,
-                        ]
-                    ]
-                ]
+                'elements' => $right_block
             ]
         ]
     ];
@@ -220,7 +225,6 @@ $elementor['data'][] =
                             "title" => __('Direct Download Link'),
                             "header_size"   => "h3",
                             "align" => "center",
-                            "elements"  => [],
                         ],
                     ],
                     [
@@ -241,7 +245,6 @@ $elementor['data'][] =
                                 "nofollow"  => ""
                             ]
                         ],
-                        "elements"  => [],
                     ],
                     [
                         "id"    => Utils::generate_random_string(),
@@ -249,15 +252,10 @@ $elementor['data'][] =
                         "widgetType"    => "text-editor",
                         "settings"  =>
                         [
-                            "editor"    => sprintf( '<b>%s</b><br/><a href="%s">%s %s</a>',
-                                                esc_html( $post->data['name'] . ' ' . $post->data['version'] ),
-                                                '[playstore_api_get_download_url]', 
-                                                __('Download'),
-                                                $post->data['file_size']
-                                            ),
+                            "editor"    => '<b>[apk name] [apk version]</b><br/>' . 
+                                            '<a href="[playstore_api_get_download_url]">Download [apk file_size]</a>',
                             "align" => "center"
                         ],
-                        "elements"  => [],
                     ]
                 ]
             ],
@@ -305,7 +303,6 @@ $elementor['data'][] =
                             ],
                             "_element_id" => "google-play-badge"
                         ],
-                        "elements"  => [],
                     ]
                 ]
             ]

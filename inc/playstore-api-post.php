@@ -51,7 +51,7 @@ class Playstore_API_Post {
 		if($preview){
 			$meta['apk_data']		= 'Array(Full APK Data)';
 		}else{
-			$meta['apk_data']		= &$this->data; // full apk data
+			$meta['apk_data']		= &$this->data; // full apk data, keep reference!
 		}
 	
 		$meta['apk_package']	= $this->package;
@@ -115,6 +115,16 @@ class Playstore_API_Post {
 		}elseif(isset(self::$VAR[ $match[1] ])){
 			return self::$VAR[ $match[1] ];
 		}else return $match[0];
+	}
+
+	function is_screenshot_downloaded()
+	{
+		return isset($this->data['screenshot_downloaded']);
+	}
+	
+	function is_icon_downloaded()
+	{
+		return isset($this->data['icon_downloaded']);
 	}
 
 	function parse_str($str)	{ return empty($str) ? '' : preg_replace_callback('/{(.*?)}/', array($this,'parse_callback'), $str); }

@@ -38,9 +38,9 @@ class Playstore_API_Admin
 		register_setting( self::$name, Playstore_API::$name, array($this, 'save') );
 
 		// Check for Elementor
-		if(class_exists('Elementor\Utils')){    
-			include Playstore_API::f('inc/elementor.php');
-		}
+		/* if(class_exists('Elementor\Utils')){
+			
+		} */
 		
 	}
 
